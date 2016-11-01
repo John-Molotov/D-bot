@@ -4,7 +4,15 @@ import string
 import logging
 import discord
 import asyncio
-    
+
+#read dictionary
+words = []
+dictin = open("dictionary", "a+")
+dictin.seek(0)
+dictionary = dictin.readlines()
+for i in range(0, len(dictionary)):
+    words.append(dictionary[i].rstrip())
+
 #logging
 logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
@@ -35,5 +43,16 @@ client = discord.Client()
 async def on_ready():
     print("Logged in as " + str(client.user.name) + "(" + str(client.user.id) + ")")
     print("------")
-
+    
+#message recieved
+@client.event
+async def on_message(message):
+    #simple words code
+    if(str(message.channel)=="simple_word_room"):
+        text = str(message.content).translate(dict.fromkeys(map(ord, string.punctuation))).split()
+        for i in range(0, len(text)):
+            if not text[i] in words:
+                await client.send_message(message.channel, "please speak simple words")
+                await client.delete_message(message)
+    
 client.run("MjQyNjI3NjY5MjExMDg2ODQ4.CvmRgQ.Xcf7Ycyc1mjFv2oXJHqEDx8VWFU")
